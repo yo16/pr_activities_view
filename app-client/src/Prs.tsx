@@ -2,13 +2,18 @@ import { useState, useEffect } from "react";
 
 import { PrRecord } from "./PrRecord";
 
+import "./Prs.css";
+
 const SERVER_URL = "http://localhost:3000";
 
 type prMasterRecord = {
     pr_id: string,
     media_code: string,
     media_contents_id: string,
-    posted_date: number,
+    posted_date: string,
+    contents: string,
+    media_name: string,
+    latest_impressions: number,
 };
 
 export const Prs: React.FC = () => {
@@ -36,14 +41,24 @@ export const Prs: React.FC = () => {
 
     return (
         <>
-            PRS---
+            <div
+                className="prRecordsTable"
+            >
             {
-                prMasterRecords.map((prd) => (
+                prMasterRecords.map((rec, i) => (
                     <PrRecord
-                        prId={prd.pr_id}
+                        prId={rec.pr_id}
+                        mediaCode={rec.media_code}
+                        mediaContentsId={rec.media_contents_id}
+                        postedDate={rec.posted_date}
+                        contents={rec.contents}
+                        mediaName={rec.media_name}
+                        lastImpressions={rec.latest_impressions}
+                        showHeader={(i===0)}
                     />
                 ))
             }
+            </div>
         </>
     );
 }

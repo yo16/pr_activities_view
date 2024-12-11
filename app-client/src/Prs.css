@@ -1,0 +1,4 @@
+.prRecordsTable {
+    display: flex;
+    flex-direction: column;
+}
