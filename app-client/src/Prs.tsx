@@ -20,7 +20,7 @@ export const Prs: React.FC = () => {
                 const response = await fetch(`${SERVER_URL}/prMasters`);
                 const { prMasters } = await response.json();
                 const recs: prMasterRecord[] = [];
-                prMasters.forEach((rec) => {
+                prMasters.forEach((rec: any) => {
                     // 同じ項目名をそのまま設定する
                     recs.push({...rec});
                 });
