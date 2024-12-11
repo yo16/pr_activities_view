@@ -18,6 +18,8 @@ interface PrRecordProps {
     mediaName: string;
     lastImpressions: number;
     showHeader: boolean;
+    onMouseClick: () => void;
+    isSelected: boolean;
 }
 
 export const PrRecord: React.FC<PrRecordProps> = ({
@@ -26,9 +28,12 @@ export const PrRecord: React.FC<PrRecordProps> = ({
     postedDate,
     contents,
     lastImpressions,
-    showHeader
+    showHeader,
+    onMouseClick,
+    isSelected,
 }) => {
     const mediaUrl = MEDIA_URL[mediaName](mediaContentsId);
+    const selectedClassName = isSelected? " divPrRecordCommonSelected": "";
 
     return (
         <>
@@ -43,7 +48,8 @@ export const PrRecord: React.FC<PrRecordProps> = ({
                 </div>
             )}
             <div
-                className="divPrRecordCommon divPrOneRecord"
+                className={`divPrRecordCommon divPrOneRecord ${selectedClassName}`}
+                onMouseDown={onMouseClick}
             >
                 <div>
                     <a href={mediaUrl} target="_blank">{mediaName}</a></div>

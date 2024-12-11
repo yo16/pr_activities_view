@@ -1,6 +1,10 @@
 .divPrRecordCommon {
     display: flex;
 }
+.divPrRecordCommonSelected {
+    background-color: #7bcf5a;
+}
+
 .divPrRecordCommon div {
     border: 1px solid #bbb;
     padding: 5px 10px;

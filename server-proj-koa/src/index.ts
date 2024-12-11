@@ -39,14 +39,15 @@ router.get('/prMasters', async (ctx) => {
     const db = await getDbConnection();
 
     // 下記を返す
-    //type prMasterRecord = {
+    //[{
     //    pr_id: string,
     //    media_code: string,
     //    media_contents_id: string,
     //    posted_date: number,
+    //    contents: string,
     //    media_name: string,
     //    latest_impressions: number,
-    //};
+    //},]
     const query = `
         SELECT
             p.pr_id AS pr_id,
@@ -91,6 +92,37 @@ router.get('/prMasters', async (ctx) => {
 
     const prMasters = await db.all(query);
     ctx.body = { prMasters };
+});
+
+
+router.get('/prDetails', async (ctx) => {
+    // クエリパラメータを取得
+    const { prid } = ctx.query;
+
+    const db = await getDbConnection();
+
+    // 下記を返す
+    //[{
+    //    pr_id: string,
+    //    time_stamp: string,
+    //    impressions: number,
+    //},]
+    const query = `
+        SELECT 
+            el.pr_id,
+            el.time_stamp,
+            el.impressions
+        FROM
+            EffectLog el
+        WHERE 
+            el.pr_id = '${prid}'
+        ORDER BY 
+            el.time_stamp
+        ;`
+    ;
+
+    const prDetails = await db.all(query);
+    ctx.body = { prDetails };
 });
 
 // ルーターをKoaに登録

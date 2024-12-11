@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 
 import { PrRecord } from "./PrRecord";
+import { PrDetails } from "./PrDetails";
+import { SERVER_URL } from "./constants";
 
 import "./Prs.css";
-
-const SERVER_URL = "http://localhost:3000";
 
 type prMasterRecord = {
     pr_id: string,
@@ -18,7 +18,10 @@ type prMasterRecord = {
 
 export const Prs: React.FC = () => {
     const [prMasterRecords, setPrMasterRecords] = useState<prMasterRecord[]>([]);
+    const [detailPrId, setDetailPrId] = useState<string | null>(null);
+    const [selectedPrId, setSelectedPrId] = useState<string | null>(null);
 
+    // 表示されたらレコード群を読む
     useEffect(() => {
         const fetchRecords = async () => {
             try {
@@ -39,25 +42,45 @@ export const Prs: React.FC = () => {
         fetchRecords();
     }, []);
 
+    // マウスクリック時に詳細を表示
+    const handleOnMouseClick = (prId: string) => {
+        setDetailPrId(prId);
+        setSelectedPrId(prId);
+    };
+
     return (
         <>
             <div
-                className="prRecordsTable"
+                className="prRecordsContainer"
             >
-            {
-                prMasterRecords.map((rec, i) => (
-                    <PrRecord
-                        prId={rec.pr_id}
-                        mediaCode={rec.media_code}
-                        mediaContentsId={rec.media_contents_id}
-                        postedDate={rec.posted_date}
-                        contents={rec.contents}
-                        mediaName={rec.media_name}
-                        lastImpressions={rec.latest_impressions}
-                        showHeader={(i===0)}
+                <div
+                    className="prRecordsTable"
+                >
+                {
+                    prMasterRecords.map((rec, i) => (
+                        <PrRecord
+                            key={`prr_${i}`}
+                            prId={rec.pr_id}
+                            mediaCode={rec.media_code}
+                            mediaContentsId={rec.media_contents_id}
+                            postedDate={rec.posted_date}
+                            contents={rec.contents}
+                            mediaName={rec.media_name}
+                            lastImpressions={rec.latest_impressions}
+                            showHeader={(i===0)}
+                            onMouseClick={() => handleOnMouseClick(rec.pr_id)}
+                            isSelected={selectedPrId===rec.pr_id}
+                        />
+                    ))
+                }
+                </div>
+                <div
+                    className="prDetailRecordsTable"
+                >{detailPrId&&(
+                    <PrDetails
+                        prId={detailPrId}
                     />
-                ))
-            }
+                )}</div>
             </div>
         </>
     );
