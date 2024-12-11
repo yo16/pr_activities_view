@@ -2,7 +2,7 @@
     display: flex;
 }
 .divPrRecordCommon div {
-    border: 1px solid #999;
+    border: 1px solid #bbb;
     padding: 5px 10px;
 }
 .divPrRecordCommon div:nth-child(1) {   /* media */
@@ -19,5 +19,5 @@
 }
 
 .divPrHeader div {
-    background-color: #cce;
+    background-color: #efa;
 }
