@@ -2,6 +2,8 @@ import Koa from 'koa';
 import Router from 'koa-router';
 import serve from 'koa-static';
 
+import { nanoid } from 'nanoid';
+
 const app = new Koa();
 const router = new Router();
 
@@ -10,8 +12,19 @@ router.get('/', (ctx) => {
   ctx.body = 'Hello, Koa with Router!';
 });
 
-router.get('/about', (ctx) => {
-  ctx.body = 'This is the About page!';
+//router.get('/about', (ctx) => {
+//  ctx.body = 'This is the About page!';
+//});
+
+// 投稿のマスターデータであるGoogle DriveのSpread Sheetから、情報を取り出し
+// ローカルのSQLiteへ登録する
+router.get('/getAllPosts', (ctx) => {
+  ctx.body = '';
+});
+
+router.get('/getNanoId', (ctx) => {
+  const id10 = nanoid(10);
+  ctx.body = id10;
 });
 
 // ルーターをKoaに登録
