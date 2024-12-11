@@ -52,7 +52,7 @@ export const PrDetails: React.FC<PrDetailsProps> = ({
 
     return (
         <>
-            <ResponsiveContainer width={300} height={400}>
+            <ResponsiveContainer width={500} height={300}>
                 <LineChart data={chartData}>
                     <Line type="monotone" dataKey="value" stroke="#8884d8" />
                     <CartesianGrid stroke="#ccc" />
