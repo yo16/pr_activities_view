@@ -32,7 +32,6 @@ export const PrDetails: React.FC<PrDetailsProps> = ({
                 const response = await fetch(`${SERVER_URL}/prDetails?prid=${prId}`);
                 const { prDetails } = await response.json();
                 const recs: prDetailRecord[] = [];
-                console.dir(prDetails);
                 prDetails.forEach((rec: any) => {
                     recs.push({
                         unixDt: moment(rec.time_stamp).valueOf(),
@@ -52,7 +51,7 @@ export const PrDetails: React.FC<PrDetailsProps> = ({
 
     return (
         <>
-            <ResponsiveContainer width={500} height={300}>
+            <ResponsiveContainer width={400} height={300}>
                 <LineChart data={chartData}>
                     <Line type="monotone" dataKey="value" stroke="#8884d8" />
                     <CartesianGrid stroke="#ccc" />
