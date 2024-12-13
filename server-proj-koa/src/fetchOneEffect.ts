@@ -10,7 +10,7 @@ import type { effectInfo } from './fetchAllEffects.js';
 
 export const fetchOneEffect = async (
     prId: string,
-): Promise<string> => {
+): Promise<string | Error> => {
     // PRMasterのpr_id,media_codeを取得
     const db = await getDbConnection();
     const query = `
@@ -28,11 +28,11 @@ export const fetchOneEffect = async (
     // 見つからない場合は、見つからない旨を返す
     if (prs.length !== 1) {
         console.warn(`Warn: Cannot find prId(${prId})`);
-        return `prId "${prId}" is not found!`;
+        return new Error(`prId "${prId}" is not found!`);
     }
 
     // media_codeごとにeffectを取得して、DBへ追加
-    const eff: effectInfo | null = await fetchOnePrIdByMedia(
+    const eff: effectInfo | null | Error = await fetchOnePrIdByMedia(
         prs[0].pr_id,
         prs[0].media_code,
         prs[0].media_contents_id
@@ -40,6 +40,10 @@ export const fetchOneEffect = async (
     if (!eff) {
         console.warn(`Warn: fetchOnePrIdByMedia returns null ! (${prId})`);
         return "error!";
+    }
+    if (eff instanceof Error) {
+        console.error(`Error: fetchOnePrIdByMedia() returns error.`, eff.message);
+        return eff;
     }
 
     // 取得した情報を、DBへ登録

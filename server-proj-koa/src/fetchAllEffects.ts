@@ -30,12 +30,15 @@ export const fetchAllEffects = async () => {
     // media_codeごとにeffectを取得して、DBへ追加
     for (let i=0; i<prs.length; i++) {
         // mediaから情報を取得
-        const eff: effectInfo | null = await fetchOnePrIdByMedia(
+        const eff: effectInfo | null | Error = await fetchOnePrIdByMedia(
             prs[i].pr_id,
             prs[i].media_code,
             prs[i].media_contents_id
         );
         if (!eff) {
+            continue;
+        }
+        if (eff instanceof Error) {
             continue;
         }
 
@@ -53,11 +56,14 @@ export const fetchOnePrIdByMedia = async (
     prId: string,
     mediaCode: number,
     mediaContentsId: string
-): Promise<effectInfo | null> => {
+): Promise<effectInfo | null | Error> => {
     let eff: effectInfo | null = null;
     switch (mediaCode) {
         case 1: // X(Twitter)
-            const met: xMetricsInfo = await fetchX(mediaContentsId);
+            const met: xMetricsInfo | Error = await fetchX(mediaContentsId);
+            if (met instanceof Error ) {
+                return met;
+            }
             eff = {
                 prId: prId,
                 impressions: met.impression_count,
@@ -65,8 +71,9 @@ export const fetchOnePrIdByMedia = async (
             break;
 
         default:    // unknown
-            console.warn(`Unknown media_code[${mediaCode}]. (pr_id=${prId})`);
-            return null;
+            const errorMessage = `Unknown media_code[${mediaCode}]. (pr_id=${prId})`;
+            console.warn(errorMessage);
+            return new Error(errorMessage);
     }
 
     return eff;

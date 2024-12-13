@@ -1,0 +1,26 @@
+.messageCommon {
+    position: fixed;
+    /* top: -50px; */
+    top: -10px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: top 1.0s ease-in-out;
+    z-index: 1000;
+    /*opacity: 0.0;*/
+}
+.messageCommon.messageShow {
+    top: 150px;
+    opacity: 1.0;
+}
+
+.messageNormal {
+    background-color: #33ffbb;
+    color: rgb(32, 110, 45);
+}
+.messageWarning {
+    background-color: #ff5733;
+    color: white;
+}

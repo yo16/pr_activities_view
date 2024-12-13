@@ -64,13 +64,17 @@ router.get('/fetchOneEffect', async (ctx) => {
     // クエリパラメータを取得
     const { prid } = ctx.query;
     if (!prid) {
-        ctx.status = 500;
-        const err = new Error("Query parameter prid is not found");
-        ctx.body = err;
-        ctx.app.emit('error', err, ctx);
+        ctx.app.emit('error', ctx);
+        ctx.throw(500, "Query parameter prid is not found");
     }
 
-    ctx.body = await fetchOneEffect(prid as string);
+    const res = await fetchOneEffect(prid as string);
+    if (res instanceof Error) {
+        console.log("--------------------- X ERROR X ----------------------");
+        ctx.app.emit('error', ctx, res);
+        ctx.throw(500, res.message);
+    }
+    ctx.body = res;
 });
 
 // ルーターをKoaに登録

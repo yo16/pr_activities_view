@@ -1,5 +1,6 @@
 
 import { SERVER_URL } from "./constants";
+import { useMessage } from "./commomComponents/MessageProvider";
 
 import "./PrRecord.css";
 
@@ -37,6 +38,8 @@ export const PrRecord: React.FC<PrRecordProps> = ({
     onMouseClick,
     isSelected,
 }) => {
+    const { showMessage } = useMessage();
+
     const mediaUrl = MEDIA_URL[mediaName](mediaContentsId);
     const selectedClassName = isSelected? " divPrRecordCommonSelected": "";
 
@@ -45,12 +48,14 @@ export const PrRecord: React.FC<PrRecordProps> = ({
         const fetchRecords = async () => {
             try {
                 // サーバーに問い合わせる
-                const response = await fetch(`${SERVER_URL}/fetchOneEffect?prid=${prId}`);
-                console.log({response});
-
+                const response: Response = await fetch(`${SERVER_URL}/fetchOneEffect?prid=${prId}`);
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
             } catch (err) {
                 const error = err as Error;
                 console.error("Error: fetchOneEffect.", prId, error.message);
+                showMessage(error.message);
             }
         };
         fetchRecords();
