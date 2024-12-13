@@ -42,7 +42,7 @@ export const Prs: React.FC = () => {
             }
         };
         fetchRecords();
-    }, []);
+    }, [prDetailsKey]);
 
     // マウスクリック時に詳細を表示
     const handleOnMouseClick = (prId: string) => {

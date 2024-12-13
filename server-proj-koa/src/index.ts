@@ -49,7 +49,6 @@ router.get('/prMasters', async (ctx) => {
     ctx.body = await getPrMasters();
 });
 
-
 router.get('/prDetails', async (ctx) => {
     // クエリパラメータを取得
     const { prid } = ctx.query;
@@ -72,10 +71,17 @@ router.get('/fetchOneEffect', async (ctx) => {
     if (res instanceof Error) {
         console.log("--------------------- X ERROR X ----------------------");
         ctx.app.emit('error', ctx, res);
-        ctx.throw(500, res.message);
+        const ms = res.message;
+        console.log("ms", ms);
+        ctx.throw(500, ms);
     }
     ctx.body = res;
 });
+
+router.get('/tagMasterMainte', async (ctx) => {
+    ctx.body = "aa";
+});
+
 
 // ルーターをKoaに登録
 app

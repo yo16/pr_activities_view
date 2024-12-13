@@ -50,7 +50,8 @@ export const PrRecord: React.FC<PrRecordProps> = ({
                 // サーバーに問い合わせる
                 const response: Response = await fetch(`${SERVER_URL}/fetchOneEffect?prid=${prId}`);
                 if (!response.ok) {
-                    throw new Error(await response.text());
+                    const responseObj = await response.json();
+                    throw new Error(responseObj.message);
                 }
             } catch (err) {
                 const error = err as Error;
