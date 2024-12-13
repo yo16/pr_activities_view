@@ -20,6 +20,7 @@ export const Prs: React.FC = () => {
     const [prMasterRecords, setPrMasterRecords] = useState<prMasterRecord[]>([]);
     const [detailPrId, setDetailPrId] = useState<string | null>(null);
     const [selectedPrId, setSelectedPrId] = useState<string | null>(null);
+    const [prDetailsKey, setPrDetailsKey] = useState<number>(0);
 
     // 表示されたらレコード群を読む
     useEffect(() => {
@@ -46,6 +47,9 @@ export const Prs: React.FC = () => {
     const handleOnMouseClick = (prId: string) => {
         setDetailPrId(prId);
         setSelectedPrId(prId);
+
+        // PrDetailsを再描画させるために、キーを更新
+        setPrDetailsKey(prevKey => prevKey + 1);
     };
 
     return (
@@ -78,6 +82,7 @@ export const Prs: React.FC = () => {
                     className="prDetailRecordsTable"
                 >{detailPrId&&(
                     <PrDetails
+                        key={`prdetails_${prDetailsKey}`}
                         prId={detailPrId}
                     />
                 )}</div>

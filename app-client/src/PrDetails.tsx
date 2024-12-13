@@ -47,13 +47,15 @@ export const PrDetails: React.FC<PrDetailsProps> = ({
         };
         fetchRecords();
 
-    }, []);
+    }, [prId]);
 
     return (
-        <>
+        <div
+            style={{backgroundColor: "#FFF"}}
+        >
             <ResponsiveContainer width={400} height={300}>
                 <LineChart data={chartData}>
-                    <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                    <Line type="monotone" dataKey="value" stroke="#f99" strokeWidth={3} />
                     <CartesianGrid stroke="#ccc" />
                     <XAxis
                         dataKey="unixDt"
@@ -72,6 +74,6 @@ export const PrDetails: React.FC<PrDetailsProps> = ({
                     />
                 </LineChart>
             </ResponsiveContainer>
-        </>
+        </div>
     );
 };

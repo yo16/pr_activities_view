@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { getPrMasters } from './getPrMasters.js';
 import { getPrDetails } from './getPrDetails.js';
 import { fetchAllEffects } from './fetchAllEffects.js';
+import { fetchOneEffect } from './fetchOneEffect.js';
 
 // .envファイルの内容を読み込む
 dotenv.config();
@@ -20,6 +21,9 @@ app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true,
 }));
+
+// 静的ファイルサーバーを設定
+app.use(serve('public'));
 
 // ルーティング
 router.get('/', (ctx) => {
@@ -56,6 +60,18 @@ router.get('/prDetails', async (ctx) => {
 router.get('/fetchAllEffects', async (ctx) => {
     ctx.body = await fetchAllEffects();
 });
+router.get('/fetchOneEffect', async (ctx) => {
+    // クエリパラメータを取得
+    const { prid } = ctx.query;
+    if (!prid) {
+        ctx.status = 500;
+        const err = new Error("Query parameter prid is not found");
+        ctx.body = err;
+        ctx.app.emit('error', err, ctx);
+    }
+
+    ctx.body = await fetchOneEffect(prid as string);
+});
 
 // ルーターをKoaに登録
 app
@@ -75,10 +91,21 @@ app
         }
     })
     .use(router.routes())
-    .use(router.allowedMethods());
+    .use(router.allowedMethods())
+;
 
-// 静的ファイルサーバーを設定
-app.use(serve('public'));
+app.on('error', (err: Error, ctx) => {
+    console.error('server error, err:', err);
+    console.error('server error, ctx:', ctx);
+});
+
+process.on("uncaughtException", (err) => {
+    console.error("Uncaught exception:", err);
+});
+  
+process.on("unhandledRejection", (reason, promise) => {
+    console.error("Unhandled rejection at:", promise, "reason:", reason);
+});
 
 // サーバー起動
 const PORT = 3000;

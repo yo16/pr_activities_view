@@ -1,3 +1,6 @@
+
+import { SERVER_URL } from "./constants";
+
 import "./PrRecord.css";
 
 const MEDIA_URL: {
@@ -21,8 +24,8 @@ interface PrRecordProps {
     onMouseClick: () => void;
     isSelected: boolean;
 }
-
 export const PrRecord: React.FC<PrRecordProps> = ({
+    prId,
     mediaName,
     mediaContentsId,
     postedDate,
@@ -34,6 +37,25 @@ export const PrRecord: React.FC<PrRecordProps> = ({
 }) => {
     const mediaUrl = MEDIA_URL[mediaName](mediaContentsId);
     const selectedClassName = isSelected? " divPrRecordCommonSelected": "";
+
+    // 更新ボタンクリック時
+    function handleOnClickUpdateButton() {
+        const fetchRecords = async () => {
+            try {
+                // サーバーに問い合わせる
+                const response = await fetch(`${SERVER_URL}/fetchOneEffect?prid=${prId}`);
+                console.log({response});
+
+            } catch (err) {
+                const error = err as Error;
+                console.error("Error: fetchOneEffect.", prId, error.message);
+            }
+        };
+        fetchRecords();
+
+        // 全体のクリックイベントを呼んで、更新する
+        onMouseClick();
+    }
 
     return (
         <>
@@ -55,7 +77,7 @@ export const PrRecord: React.FC<PrRecordProps> = ({
                     <a href={mediaUrl} target="_blank">{mediaName}</a></div>
                 <div>{postedDate}</div>
                 <div>{contents}</div>
-                <div>{lastImpressions}</div>
+                <div>{lastImpressions}<br /><button onClick={handleOnClickUpdateButton}>更新</button></div>
             </div>
         </>
     );
