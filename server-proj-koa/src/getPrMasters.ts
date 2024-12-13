@@ -12,6 +12,7 @@ export const getPrMasters = async () => {
     //    contents: string,
     //    media_name: string,
     //    latest_impressions: number,
+    //    latest_impressions_dt: string,
     //},]
     const query = `
         SELECT
@@ -21,14 +22,16 @@ export const getPrMasters = async () => {
             p.posted_date AS posted_date,
             p.contents as contents,
             mm.media_name AS media_name,
-            el.latest_impressions AS latest_impressions
+            el.latest_impressions AS latest_impressions,
+            el.latest_impressions_dt AS latest_impressions_dt
         FROM
             PRMaster AS p
             INNER JOIN
                 (
                     SELECT 
                         el.pr_id AS pr_id,
-                        el.impressions AS latest_impressions
+                        el.impressions AS latest_impressions,
+                        el.time_stamp AS latest_impressions_dt
                     FROM
                         EffectLog AS el,
                         (

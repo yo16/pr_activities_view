@@ -19,7 +19,8 @@ interface PrRecordProps {
     postedDate: string;
     contents: string;
     mediaName: string;
-    lastImpressions: number;
+    latestImpressions: number;
+    latestImpressionsDt: string;
     showHeader: boolean;
     onMouseClick: () => void;
     isSelected: boolean;
@@ -30,7 +31,8 @@ export const PrRecord: React.FC<PrRecordProps> = ({
     mediaContentsId,
     postedDate,
     contents,
-    lastImpressions,
+    latestImpressions,
+    latestImpressionsDt,
     showHeader,
     onMouseClick,
     isSelected,
@@ -66,7 +68,7 @@ export const PrRecord: React.FC<PrRecordProps> = ({
                     <div>media</div>
                     <div>posted</div>
                     <div>contents</div>
-                    <div>last imp.</div>
+                    <div>latest imp.</div>
                 </div>
             )}
             <div
@@ -77,7 +79,7 @@ export const PrRecord: React.FC<PrRecordProps> = ({
                     <a href={mediaUrl} target="_blank">{mediaName}</a></div>
                 <div>{postedDate}</div>
                 <div>{contents}</div>
-                <div>{lastImpressions}<br /><button onClick={handleOnClickUpdateButton}>更新</button></div>
+                <div><span className="tooltip">{latestImpressions}<span className="tooltiptext">{latestImpressionsDt}</span></span><br /><button onClick={handleOnClickUpdateButton}>更新</button></div>
             </div>
         </>
     );

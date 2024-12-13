@@ -14,6 +14,7 @@ type prMasterRecord = {
     contents: string,
     media_name: string,
     latest_impressions: number,
+    latest_impressions_dt: string,
 };
 
 export const Prs: React.FC = () => {
@@ -70,7 +71,8 @@ export const Prs: React.FC = () => {
                             postedDate={rec.posted_date}
                             contents={rec.contents}
                             mediaName={rec.media_name}
-                            lastImpressions={rec.latest_impressions}
+                            latestImpressions={rec.latest_impressions}
+                            latestImpressionsDt={rec.latest_impressions_dt}
                             showHeader={(i===0)}
                             onMouseClick={() => handleOnMouseClick(rec.pr_id)}
                             isSelected={selectedPrId===rec.pr_id}

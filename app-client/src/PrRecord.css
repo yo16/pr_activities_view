@@ -21,7 +21,7 @@
 }
 .divPrRecordCommon div:nth-child(4) {   /* last imp. */
     width: 50px;
-    text-align: right;
+    text-align: center;
 }
 
 .divPrHeader div {
