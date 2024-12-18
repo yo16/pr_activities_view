@@ -1,14 +1,16 @@
-import Koa from 'koa';
+import Koa, { ParameterizedContext } from 'koa';
 import Router from 'koa-router';
 import serve from 'koa-static';
 import cors from '@koa/cors';
 import { nanoid } from 'nanoid';
 import dotenv from 'dotenv';
+import bodyParser from 'koa-bodyparser';
 
 import { getPrMasters } from './getPrMasters.js';
 import { getPrDetails } from './getPrDetails.js';
 import { fetchAllEffects } from './fetchAllEffects.js';
 import { fetchOneEffect } from './fetchOneEffect.js';
+import { postTagGroup } from './tagGroups.js';
 
 // .envファイルの内容を読み込む
 dotenv.config();
@@ -24,6 +26,14 @@ app.use(cors({
 
 // 静的ファイルサーバーを設定
 app.use(serve('public'));
+
+// body parser
+app.use(bodyParser());
+
+// ルートの登録
+app.use(router.routes());
+// サポートされていないHTTPメソッドに対するハンドリング
+app.use(router.allowedMethods());
 
 // ルーティング
 router.get('/', (ctx) => {
@@ -78,8 +88,43 @@ router.get('/fetchOneEffect', async (ctx) => {
     ctx.body = res;
 });
 
-router.get('/tagMasterMainte', async (ctx) => {
-    ctx.body = "aa";
+// tagGroups
+// タググループ一覧を返す
+router.get('/tagGroups', async (ctx) => {
+    
+
+});
+
+// タググループを追加
+interface TagGroups_post {
+    tag_group_name: string;
+}
+router.post('/tagGroups', async (ctx: ParameterizedContext) => {
+    const { tag_group_name } = ctx.request.body as TagGroups_post;
+
+    // DBへ登録
+    let newTagGroupId: string = "";
+    try {
+        newTagGroupId = await postTagGroup(tag_group_name);
+    }
+    catch (err) {
+        let errorMessage = "Error while processing postTagGroups";
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        };
+        ctx.app.emit(errorMessage, ctx);
+        ctx.throw(400, errorMessage);
+    }
+
+    ctx.body = {
+        tag_group_id: `${newTagGroupId}`,
+        tag_group_name: `${tag_group_name}`
+    };
+});
+
+// tagのPost
+router.post('/tags', async (ctx) => {
+    
 });
 
 
