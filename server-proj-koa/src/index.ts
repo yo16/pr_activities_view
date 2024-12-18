@@ -10,7 +10,7 @@ import { getPrMasters } from './getPrMasters.js';
 import { getPrDetails } from './getPrDetails.js';
 import { fetchAllEffects } from './fetchAllEffects.js';
 import { fetchOneEffect } from './fetchOneEffect.js';
-import { postTagGroup } from './tagGroups.js';
+import { getTagGroups, postTagGroup } from './tagGroups.js';
 
 // .envファイルの内容を読み込む
 dotenv.config();
@@ -83,7 +83,7 @@ router.get('/fetchOneEffect', async (ctx) => {
         ctx.app.emit('error', ctx, res);
         const ms = res.message;
         console.log("ms", ms);
-        ctx.throw(500, ms);
+        ctx.throw(400, ms);
     }
     ctx.body = res;
 });
@@ -91,8 +91,19 @@ router.get('/fetchOneEffect', async (ctx) => {
 // tagGroups
 // タググループ一覧を返す
 router.get('/tagGroups', async (ctx) => {
-    
-
+    let ret = null;
+    try {
+        ret = await getTagGroups();
+    }
+    catch (err) {
+        let errorMessage = "getTagGroups error";
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        }
+        ctx.app.emit(errorMessage, ctx);
+        ctx.throw(500, errorMessage);
+    }
+    ctx.body = ret;
 });
 
 // タググループを追加
