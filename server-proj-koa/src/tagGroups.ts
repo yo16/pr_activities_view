@@ -35,8 +35,8 @@ export const getTagGroups = async (): Promise<{tag_group_id: string, tag_group_n
         if (err instanceof HandlableError) {
             throw new Error(err.message);
         }
-        const errorMessage = "postTagGroup error";
-        console.error("postTagGroup error", err);
+        const errorMessage = "getTagGroup error";
+        console.error("getTagGroup error", err);
         throw new Error(errorMessage);
     }
 
