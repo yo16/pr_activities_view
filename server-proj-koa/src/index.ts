@@ -11,6 +11,7 @@ import { getPrDetails } from './getPrDetails.js';
 import { fetchAllEffects } from './fetchAllEffects.js';
 import { fetchOneEffect } from './fetchOneEffect.js';
 import { getTagGroups, postTagGroup } from './tagGroups.js';
+import { getTagsByTagGroupId } from './tags.js';
 
 // .envファイルの内容を読み込む
 dotenv.config();
@@ -101,7 +102,7 @@ router.get('/tagGroups', async (ctx) => {
             errorMessage = err.message;
         }
         ctx.app.emit(errorMessage, ctx);
-        ctx.throw(500, errorMessage);
+        ctx.throw(400, errorMessage);
     }
     ctx.body = ret;
 });
@@ -133,9 +134,38 @@ router.post('/tagGroups', async (ctx: ParameterizedContext) => {
     };
 });
 
-// tagのPost
+// tag
+// タグ一覧を返す
+router.get('/tags', async (ctx) => {
+    // クエリパラメータを取得
+    const { tag_group_id } = ctx.query;
+    if (!tag_group_id) {
+        ctx.throw(400, "Illigal parameter tag_group_id");
+    }
+    const strTagGroupId: string = tag_group_id as string;
+
+    let ret = null;
+    try {
+        ret = await getTagsByTagGroupId(strTagGroupId);
+    }
+    catch (err) {
+        let errorMessage = "getTagsByTagGroupId error";
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        }
+        ctx.app.emit(errorMessage, ctx);
+        ctx.throw(400, errorMessage);
+    }
+    ctx.body = ret;
+});
+
+interface Tags_post {
+    tag_name: string;
+}
+// タグを追加
 router.post('/tags', async (ctx) => {
-    
+    const { tag_name } = ctx.request.body as Tags_post;
+    ctx.body = "OK";
 });
 
 
