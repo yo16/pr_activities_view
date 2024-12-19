@@ -11,7 +11,7 @@ import { getPrDetails } from './getPrDetails.js';
 import { fetchAllEffects } from './fetchAllEffects.js';
 import { fetchOneEffect } from './fetchOneEffect.js';
 import { getTagGroups, postTagGroup } from './tagGroups.js';
-import { getTagsByTagGroupId } from './tags.js';
+import { getTagsByTagGroupId, postTag } from './tags.js';
 
 // .envファイルの内容を読み込む
 dotenv.config();
@@ -161,11 +161,31 @@ router.get('/tags', async (ctx) => {
 
 interface Tags_post {
     tag_name: string;
+    tag_group_id: string;
 }
 // タグを追加
 router.post('/tags', async (ctx) => {
-    const { tag_name } = ctx.request.body as Tags_post;
-    ctx.body = "OK";
+    const { tag_name, tag_group_id } = ctx.request.body as Tags_post;
+
+    // DBへ登録
+    let newTagId: string = "";
+    try {
+        newTagId = await postTag(tag_group_id, tag_name);
+    }
+    catch (err) {
+        let errorMessage = "Error while processing postTags";
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        };
+        ctx.app.emit(errorMessage, ctx);
+        ctx.throw(400, errorMessage);
+    }
+
+    ctx.body = {
+        tag_id: `${newTagId}`,
+        tag_group_id: `${tag_group_id}`,
+        tag_name: `${tag_name}`
+    };
 });
 
 
