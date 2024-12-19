@@ -2,7 +2,7 @@
     新規タグ用ダイアログ
 */
 
-import { FormEvent, useState } from "react";
+import { FormEvent } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
