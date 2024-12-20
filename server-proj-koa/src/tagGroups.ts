@@ -110,3 +110,59 @@ export const postTagGroup = async (tagGroupName: string): Promise<string> => {
 
     return id10;
 }
+
+/*
+    PrTagGroupMasterのtag_nameを更新
+*/
+export const updateTagGroup = async (tagGroupId: string, tagGroupName: string): Promise<void> => {
+    if ((!tagGroupId) || (tagGroupId.length === 0)) {
+        throw new Error("Post Tag error. tagGroupId is empty.");
+    }
+    if ((!tagGroupName) || (tagGroupName.length === 0)) {
+        throw new Error("Post Tag error. tagGroupName is empty.");
+    }
+
+    try {
+        const db = await getDbConnection();
+
+        // 同じ名前のタグが既にあったらエラー
+        const query1 = `
+            SELECT
+                1
+            FROM
+                PRTagGroupMaster tgm
+            WHERE
+                tgm.tag_group_name = '${tagGroupName}' AND
+                tgm.tag_group_id != '${tagGroupId}'
+            ;`
+        ;
+        const row = await db.get(query1);
+        if (row) {
+            // 存在している
+            throw new HandlableError(`Tag group name '${tagGroupName}' is already exists.`);
+        }
+
+        // update
+        const query2 = `
+            UPDATE
+                PRTagGroupMaster
+            SET
+                tag_group_name = '${tagGroupName}'
+            WHERE
+                tag_group_id = '${tagGroupId}'
+            ;`
+        ;
+        db.run(query2);
+        db.close();
+
+    } catch (err) {
+        if (err instanceof HandlableError) {
+            throw new Error(err.message);
+        }
+        const errorMessage = "patchTagGroup error";
+        console.error("updateTag error", err);
+        throw new Error(errorMessage);
+    }
+
+    return;
+};

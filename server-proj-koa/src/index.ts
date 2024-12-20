@@ -10,8 +10,8 @@ import { getPrMasters } from './getPrMasters.js';
 import { getPrDetails } from './getPrDetails.js';
 import { fetchAllEffects } from './fetchAllEffects.js';
 import { fetchOneEffect } from './fetchOneEffect.js';
-import { getTagGroups, postTagGroup } from './tagGroups.js';
-import { getTagsByTagGroupId, postTag } from './tags.js';
+import { getTagGroups, postTagGroup, updateTagGroup } from './tagGroups.js';
+import { getTagsByTagGroupId, postTag, updateTag } from './tags.js';
 
 // .envファイルの内容を読み込む
 dotenv.config();
@@ -134,6 +134,34 @@ router.post('/tagGroups', async (ctx: ParameterizedContext) => {
     };
 });
 
+// タググループを更新
+interface TagGroups_patch {
+    tag_group_id: string;
+    tag_group_name: string;
+}
+router.patch('/tagGroups', async (ctx: ParameterizedContext) => {
+    const { tag_group_id, tag_group_name } = ctx.request.body as TagGroups_patch;
+
+    // DBの更新
+    let newTagGroupId: string = "";
+    try {
+        await updateTagGroup(tag_group_id, tag_group_name);
+    }
+    catch (err) {
+        let errorMessage = "Error while processing updateTagGroup";
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        };
+        ctx.app.emit(errorMessage, ctx);
+        ctx.throw(400, errorMessage);
+    }
+
+    ctx.body = {
+        tag_group_id: `${tag_group_id}`,
+        tag_group_name: `${tag_group_name}`
+    };
+});
+
 // tag
 // タグ一覧を返す
 router.get('/tags', async (ctx) => {
@@ -159,11 +187,11 @@ router.get('/tags', async (ctx) => {
     ctx.body = ret;
 });
 
+// タグを追加
 interface Tags_post {
     tag_name: string;
     tag_group_id: string;
 }
-// タグを追加
 router.post('/tags', async (ctx) => {
     const { tag_name, tag_group_id } = ctx.request.body as Tags_post;
 
@@ -185,6 +213,33 @@ router.post('/tags', async (ctx) => {
         tag_id: `${newTagId}`,
         tag_group_id: `${tag_group_id}`,
         tag_name: `${tag_name}`
+    };
+});
+
+// タグ名を変更
+interface Tags_patch {
+    tag_id: string;
+    tag_name: string;
+}
+router.patch('/tags', async (ctx) => {
+    const { tag_id, tag_name } = ctx.request.body as Tags_patch;
+
+    // 更新
+    try {
+        await updateTag(tag_id, tag_name);
+    }
+    catch (err) {
+        let errorMessage = "Error while processing patchTag";
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        };
+        ctx.app.emit(errorMessage, ctx);
+        ctx.throw(400, errorMessage);
+    }
+
+    ctx.body = {
+        tag_id: `${tag_id}`,
+        tag_name: `${tag_name}`,
     };
 });
 

@@ -6,6 +6,8 @@ import { nanoid } from 'nanoid';
 
 import { HandlableError } from './HandlableError.js';
 import { getDbConnection, getNowStr } from './db_sqlite/db.js';
+import { FORMAT } from 'sqlite3';
+import { on } from 'events';
 
 /*
     指定されたTagGroupIdを持つtagを取得
@@ -116,4 +118,61 @@ export const postTag = async (tagGroupId: string, tagName: string): Promise<stri
     }
 
     return id10;
-}
+};
+
+
+/*
+    PrTagMasterのtag_nameを更新
+*/
+export const updateTag = async (tagId: string, tagName: string): Promise<void> => {
+    if ((!tagId) || (tagId.length === 0)) {
+        throw new Error("Post Tag error. tag_id is empty.");
+    }
+    if ((!tagName) || (tagName.length === 0)) {
+        throw new Error("Post Tag error. tag_name is empty.");
+    }
+
+    try {
+        const db = await getDbConnection();
+
+        // 同じ名前のタグが既にあったらエラー
+        const query1 = `
+            SELECT
+                1
+            FROM
+                PRTagMaster tm
+            WHERE
+                tm.tag_name = '${tagName}' AND
+                tm.tag_id != '${tagId}'
+            ;`
+        ;
+        const row = await db.get(query1);
+        if (row) {
+            // 存在している
+            throw new HandlableError(`Tag name '${tagName}' is already exists.`);
+        }
+
+        // update
+        const query2 = `
+            UPDATE
+                PRTagMaster
+            SET
+                tag_name = '${tagName}'
+            WHERE
+                tag_id = '${tagId}'
+            ;`
+        ;
+        db.run(query2);
+        db.close();
+
+    } catch (err) {
+        if (err instanceof HandlableError) {
+            throw new Error(err.message);
+        }
+        const errorMessage = "patchTag error";
+        console.error("updateTag error", err);
+        throw new Error(errorMessage);
+    }
+
+    return ;
+};

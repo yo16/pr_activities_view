@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent, useRef } from 'react';
 
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
+import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';    /* Material Icons */
 import Menu from '@mui/material/Menu';
@@ -13,6 +12,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
@@ -30,11 +30,15 @@ export const TagGroup: React.FC<TagGroupProps> = ({
     tagGroupId,
     tagGroupName
 }) => {
+    const [ isEditingTitle, setIsEditingTitle ] = useState<boolean>(false);
+    const [ dispTagGroupName, setDispTagGroupName ] = useState<string>(tagGroupName);
+    const [ curTagGroupName, setCurTagGroupName ] = useState<string>(tagGroupName);
     const [ tags, setTags ] = useState<{tagId: string, tagName: string}[]>([]);
     const [ anchorEl, setAnchorEl ] = useState<null | HTMLElement>(null);
     const [ openDialogCreateNewTag, setOpenDialogCreateNewTag ] = useState<boolean>(false);
     const isOpenMenu = Boolean(anchorEl);
     const { showMessage } = useMessage();
+    const inputTitleRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -72,10 +76,16 @@ export const TagGroup: React.FC<TagGroupProps> = ({
         handleCloseMenu();
         setOpenDialogCreateNewTag(true);
     }
+    /*
+    なぜかフォーカスがすぐ外れてしまうため、機能停止！
+    // メニュー：グループ名リネーム
     const handleMenuRenameGroup = () => {
         handleCloseMenu();
 
+        // TextFieldを表示
+        setIsEditingTitle(true);
     }
+    */
     const handleMenuDeleteGroup = () => {
         handleCloseMenu();
         
@@ -89,7 +99,6 @@ export const TagGroup: React.FC<TagGroupProps> = ({
         }
 
         // 新規タグ登録
-        console.log("しんきたくとうろく", newTagName);
         const postData = async () => {
             try {
                 // サーバーに問い合わせる
@@ -121,6 +130,55 @@ export const TagGroup: React.FC<TagGroupProps> = ({
         postData();
     }
 
+    const handleClickTitle = () => {
+        setIsEditingTitle(true);
+    }
+    const handleChangeTitle = (event: ChangeEvent<HTMLInputElement>) => {
+        console.log(event.target.value);
+        setCurTagGroupName(event.target.value);
+    }
+    const handleFocusTitle = () => {
+        console.log("focus!");
+    }
+    const handleBlurTitle = () => {
+        console.log("Blue!!!");
+        setIsEditingTitle(false);
+
+        // フォーカス前と異なっている場合は、tagGroupNameを更新する
+        if (dispTagGroupName !== curTagGroupName) {
+            // 更新
+            const patchData = async () => {
+                try {
+                    // サーバーに問い合わせる
+                    const response: Response = await fetch(`${SERVER_URL}/tagGroups`, {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            tag_group_id: tagGroupId,
+                            tag_group_name: curTagGroupName,
+                        })
+                    });
+                    if (!response.ok) {
+                        throw new Error(await response.text());
+                    }
+    
+                    // タググループ名を更新
+                    setDispTagGroupName(curTagGroupName);
+    
+                } catch (err) {
+                    const error = err as Error;
+                    console.error("Error: patch TagGroups.", error.message);
+                    showMessage(error.message);
+                }
+            }
+    
+            patchData();
+        }
+    }
+
+
     return (
         <>
             <Card
@@ -130,25 +188,31 @@ export const TagGroup: React.FC<TagGroupProps> = ({
                     borderRadius: "10px"
                 }}
             >
-                <CardContent>
-                    <AppBar
-                        position="relative" 
-                        color="primary"
-                        sx={{
-                            borderRadius: "8px"
-                        }}
-                    >
-                        <Toolbar
-                            variant="dense"
-                        >
-                            <Typography
-                                gutterBottom
-                                variant="h6"
-                                component="div"
-                                sx={{ flexGrow: 1 }}
+                <CardHeader
+                    title={
+                        isEditingTitle?
+                            (
+                                <TextField
+                                    value={curTagGroupName}
+                                    autoFocus
+                                    onChange={handleChangeTitle}
+                                    onFocus={handleFocusTitle}
+                                    onBlur={handleBlurTitle}
+                                    size="small"
+                                    ref={inputTitleRef}
+                                />
+                            )
+                        : (
+                            <span
+                                onClick={handleClickTitle}
+                                style={{cursor: "text"}}
                             >
-                                {tagGroupName}
-                            </Typography>
+                                {dispTagGroupName}
+                            </span>
+                        )
+                    }
+                    action={
+                        <>
                             <IconButton
                                 size="large"
                                 aria-label="display more actions"
@@ -172,17 +236,21 @@ export const TagGroup: React.FC<TagGroupProps> = ({
                                     <ListItemText>Add new tag</ListItemText>
                                 </MenuItem>
                                 <Divider />
+                                {/*
                                 <MenuItem onClick={handleMenuRenameGroup}>
                                     <ListItemIcon><EditIcon /></ListItemIcon>
                                     <ListItemText>Rename this group</ListItemText>
                                 </MenuItem>
+                                */}
                                 <MenuItem onClick={handleMenuDeleteGroup}>
                                     <ListItemIcon><HighlightOffIcon /></ListItemIcon>
                                     <ListItemText>Delete this group</ListItemText>
                                 </MenuItem>
                             </Menu>
-                        </Toolbar>
-                    </AppBar>
+                        </>
+                    }
+                />
+                <CardContent>
                     {(tags.length === 0)
                         ? (
                             <Typography

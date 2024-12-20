@@ -11,7 +11,13 @@ export const Tag: React.FC<TagProps> = ({
 }) => {
     return (
         <>
-            <Chip label={tagName} color="primary" />
+            <Chip
+                label={tagName}
+                color="primary"
+                sx={{
+                    margin: "1px"
+                }}
+            />
         </>
     );
 }
